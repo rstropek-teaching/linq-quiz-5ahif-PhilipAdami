@@ -16,7 +16,15 @@ namespace LinqQuiz.Library
         /// </exception>
         public static int[] GetEvenNumbers(int exclusiveUpperLimit)
         {
-            throw new NotImplementedException();
+            List<int> list = new List<int>();
+
+            if (exclusiveUpperLimit < 1) throw new ArgumentOutOfRangeException();
+
+            for(int i=1; i<exclusiveUpperLimit; i++)
+            {
+                list.Add(i);
+            }
+            return list.Where(s => s % 2 == 0).ToArray();
         }
 
         /// <summary>
@@ -33,7 +41,17 @@ namespace LinqQuiz.Library
         /// </remarks>
         public static int[] GetSquares(int exclusiveUpperLimit)
         {
-            throw new NotImplementedException();
+
+            List<int> list = new List<int>();
+
+            for(int i = exclusiveUpperLimit-1; i>0; i--)
+            {
+                if (i * i > System.Int32.MaxValue/2)
+                    throw new OverflowException();
+                    list.Add(i * i);                                                       
+                            
+            }
+            return list.OrderByDescending(p=> p).Where(s=> s%7==0).ToArray();
         }
 
         /// <summary>
@@ -52,7 +70,35 @@ namespace LinqQuiz.Library
         /// </remarks>
         public static FamilySummary[] GetFamilyStatistic(IReadOnlyCollection<IFamily> families)
         {
-            throw new NotImplementedException();
+            List<FamilySummary> fs = new List<FamilySummary>();
+            if (families == null)
+            {
+                throw new ArgumentNullException();
+            }
+            for (int i = 0; i < families.Count; i++)
+            {
+                IFamily family = families.ElementAt(i);
+                double old = 0.0;
+                double count = 0.0;
+                double temp = 0.0;
+                if (family.Persons.Count > 0)
+                {
+                    for (int j = 0; j < family.Persons.Count; j++)
+                    {
+                        IPerson person = family.Persons.ElementAt(j);
+                        old += (int)person.Age;
+                        count++;
+                    }
+                    temp = old / count;
+                }
+                FamilySummary help = new FamilySummary();
+                help.FamilyID = family.ID;
+                help.NumberOfFamilyMembers = (int)count;
+                help.AverageAge = (decimal)temp;
+                fs.Add(help);
+
+            }
+            return fs.ToArray();
         }
 
         /// <summary>
@@ -70,7 +116,27 @@ namespace LinqQuiz.Library
         /// </remarks>
         public static (char letter, int numberOfOccurrences)[] GetLetterStatistic(string text)
         {
-            throw new NotImplementedException();
+            text.ToUpper();
+            text.ToCharArray();
+            string neu = "";
+            for(int i=0; i<text.Length; i++)
+            {
+                if (Char.IsLetter(text[i])){
+                    neu += text[i];
+                }
+            }
+            Dictionary<char, int> occs = neu.Distinct().Select(x => new KeyValuePair<char, int>(x, neu.Count(f => f == x))).ToDictionary(k => k.Key, v => v.Value);
+            var expectedResult = new(char letter, int numberOfOccurrences)[occs.Count];
+            for (int count = 0; count < occs.Count; count++)
+            {
+                var element = occs.ElementAt(count);
+                expectedResult[count].letter = element.Key;
+                expectedResult[count].numberOfOccurrences = element.Value;
+
+            }
+            return expectedResult;
+            
         }
+
     }
 }
